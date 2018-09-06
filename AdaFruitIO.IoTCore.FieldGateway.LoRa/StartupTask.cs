@@ -19,6 +19,7 @@
 namespace devMobile.AdaFruitIO.IoTCore.FieldGateway.LoRa
 {
 	using System;
+	using System.ComponentModel;
 	using System.Diagnostics;
 	using System.IO;
 	using System.Text;
@@ -30,7 +31,6 @@ namespace devMobile.AdaFruitIO.IoTCore.FieldGateway.LoRa
 	using Windows.Foundation.Diagnostics;
 	using Windows.Storage;
 	using devMobile.IoT.Rfm9x;
-	using System.ComponentModel;
 
 	public sealed class StartupTask : IBackgroundTask
 	{
@@ -42,6 +42,22 @@ namespace devMobile.AdaFruitIO.IoTCore.FieldGateway.LoRa
 		private const byte ResetLine = 17;
 		private const byte InterruptLine = 4;
 		private Rfm9XDevice rfm9XDevice = new Rfm9XDevice(ChipSelectPin.CS0, ChipSelectLine, ResetLine, InterruptLine);
+#endif
+#if M2M
+		private const byte ChipSelectLine = 25;
+		private const byte ResetLine = 17;
+		private const byte InterruptLine = 4;
+		private Rfm9XDevice rfm9XDevice = new Rfm9XDevice(ChipSelectPin.CS0, ChipSelectLine, ResetLine, InterruptLine);
+#endif
+#if ELECROW
+		private const byte ResetLine = 22;
+		private const byte InterruptLine = 25;
+		private Rfm9XDevice rfm9XDevice = new Rfm9XDevice(ChipSelectPin.CS1, ResetLine, InterruptLine);
+#endif
+#if ELECTRONIC_TRICKS
+		private const byte ResetLine = 22;
+		private const byte InterruptLine = 25;
+		private Rfm9XDevice rfm9XDevice = new Rfm9XDevice(ChipSelectPin.CS0, 22, 25);
 #endif
 		private const byte AddressLengthMinimum = 1;
 		private const byte AddressLengthMaximum = 15;
@@ -165,7 +181,7 @@ namespace devMobile.AdaFruitIO.IoTCore.FieldGateway.LoRa
 					AdaFruitIOUserName = "AdaFruit User name goes here",
 					AdaFruitIOApiKey = "AdaFruitIO API Key goes here",
 					AdaFruitIOGroupName = "AdaFruit Group name goes here",
-					Address = "FieldGatewayAddress goes here",
+					Address = "Address here",
 					Frequency = 915000000,
 				};
 
