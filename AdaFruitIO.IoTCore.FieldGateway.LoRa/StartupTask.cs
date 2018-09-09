@@ -57,7 +57,15 @@ namespace devMobile.AdaFruitIO.IoTCore.FieldGateway.LoRa
 #if ELECTRONIC_TRICKS
 		private const byte ResetLine = 22;
 		private const byte InterruptLine = 25;
-		private Rfm9XDevice rfm9XDevice = new Rfm9XDevice(ChipSelectPin.CS0, 22, 25);
+		private Rfm9XDevice rfm9XDevice = new Rfm9XDevice(ChipSelectPin.CS0, ResetLine, InterruptLine);
+#endif
+#if UPUTRONICS_RPIZERO_CS0
+		private const byte InterruptLine = 25;
+		private Rfm9XDevice rfm9XDevice = new Rfm9XDevice(ChipSelectPin.CS0, InterruptLine);
+#endif
+#if UPUTRONICS_RPIZERO_CS1
+		private const byte InterruptLine = 16;
+		private Rfm9XDevice rfm9XDevice = new Rfm9XDevice(ChipSelectPin.CS1, InterruptLine);
 #endif
 		private const byte AddressLengthMinimum = 1;
 		private const byte AddressLengthMaximum = 15;
