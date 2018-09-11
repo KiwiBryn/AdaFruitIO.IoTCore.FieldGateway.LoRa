@@ -67,6 +67,14 @@ namespace devMobile.AdaFruitIO.IoTCore.FieldGateway.LoRa
 		private const byte InterruptLine = 16;
 		private Rfm9XDevice rfm9XDevice = new Rfm9XDevice(ChipSelectPin.CS1, InterruptLine);
 #endif
+#if UPUTRONICS_RPIPLUS_CS0 // 915MHz
+		private const byte InterruptLine = 25;
+		private Rfm9XDevice rfm9XDevice = new Rfm9XDevice(ChipSelectPin.CS0, InterruptLine);
+#endif
+#if UPUTRONICS_RPIPLUS_CS1 // 433MHz
+		private const byte InterruptLine = 16;
+		private Rfm9XDevice rfm9XDevice = new Rfm9XDevice(ChipSelectPin.CS1, InterruptLine);
+#endif
 		private const byte AddressLengthMinimum = 1;
 		private const byte AddressLengthMaximum = 15;
 
