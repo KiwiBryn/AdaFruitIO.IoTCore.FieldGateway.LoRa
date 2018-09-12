@@ -140,39 +140,39 @@ namespace devMobile.AdaFruitIO.IoTCore.FieldGateway.LoRa
 
 			rfm9XDevice.Receive(Encoding.UTF8.GetBytes(this.applicationSettings.Address));
 
-			LoggingFields rf24Settings = new LoggingFields();
-			rf24Settings.AddString("Address", this.applicationSettings.Address);
-			rf24Settings.AddDouble("Frequency", this.applicationSettings.Frequency);
-			rf24Settings.AddBoolean("DataRate", this.applicationSettings.PABoost);
+			LoggingFields loRaSettings = new LoggingFields();
+			loRaSettings.AddString("Address", this.applicationSettings.Address);
+			loRaSettings.AddDouble("Frequency", this.applicationSettings.Frequency);
+			loRaSettings.AddBoolean("PABoost", this.applicationSettings.PABoost);
 
-			rf24Settings.AddUInt8("MaxPower", this.applicationSettings.MaxPower);
-			rf24Settings.AddUInt8("OutputPower", this.applicationSettings.OutputPower);
-			rf24Settings.AddBoolean("OCPOn", this.applicationSettings.OCPOn);
-			rf24Settings.AddUInt8("OCPTrim", this.applicationSettings.OCPTrim);
+			loRaSettings.AddUInt8("MaxPower", this.applicationSettings.MaxPower);
+			loRaSettings.AddUInt8("OutputPower", this.applicationSettings.OutputPower);
+			loRaSettings.AddBoolean("OCPOn", this.applicationSettings.OCPOn);
+			loRaSettings.AddUInt8("OCPTrim", this.applicationSettings.OCPTrim);
 
-			rf24Settings.AddString("LnaGain", this.applicationSettings.LnaGain.ToString());
-			rf24Settings.AddBoolean("lnaBoost", this.applicationSettings.LNABoost);
+			loRaSettings.AddString("LnaGain", this.applicationSettings.LnaGain.ToString());
+			loRaSettings.AddBoolean("lnaBoost", this.applicationSettings.LNABoost);
 
-			rf24Settings.AddString("codingRate", this.applicationSettings.CodingRate.ToString());
-			rf24Settings.AddString("implicitHeaderModeOn", applicationSettings.ImplicitHeaderModeOn.ToString());
-			rf24Settings.AddString("spreadingFactor", this.applicationSettings.SpreadingFactor.ToString());
-			rf24Settings.AddBoolean("rxPayloadCrcOn", true);
+			loRaSettings.AddString("codingRate", this.applicationSettings.CodingRate.ToString());
+			loRaSettings.AddString("implicitHeaderModeOn", applicationSettings.ImplicitHeaderModeOn.ToString());
+			loRaSettings.AddString("spreadingFactor", this.applicationSettings.SpreadingFactor.ToString());
+			loRaSettings.AddBoolean("rxPayloadCrcOn", true);
 
-			rf24Settings.AddUInt8("symbolTimeout", this.applicationSettings.SymbolTimeout);
-			rf24Settings.AddUInt8("preambleLength", this.applicationSettings.PreambleLength);
-			rf24Settings.AddUInt8("payloadLength", this.applicationSettings.PayloadLength);
+			loRaSettings.AddUInt8("symbolTimeout", this.applicationSettings.SymbolTimeout);
+			loRaSettings.AddUInt8("preambleLength", this.applicationSettings.PreambleLength);
+			loRaSettings.AddUInt8("payloadLength", this.applicationSettings.PayloadLength);
 
-			rf24Settings.AddUInt8("payloadMaxLength",this.applicationSettings.PayloadMaxLength);
-			rf24Settings.AddUInt8("freqHoppingPeriod", this.applicationSettings.FreqHoppingPeriod);
-			rf24Settings.AddBoolean("lowDataRateOptimize", this.applicationSettings.LowDataRateOptimize);
-			rf24Settings.AddUInt8("ppmCorrection", this.applicationSettings.PpmCorrection);
+			loRaSettings.AddUInt8("payloadMaxLength",this.applicationSettings.PayloadMaxLength);
+			loRaSettings.AddUInt8("freqHoppingPeriod", this.applicationSettings.FreqHoppingPeriod);
+			loRaSettings.AddBoolean("lowDataRateOptimize", this.applicationSettings.LowDataRateOptimize);
+			loRaSettings.AddUInt8("ppmCorrection", this.applicationSettings.PpmCorrection);
 
-			rf24Settings.AddString("detectionOptimize", this.applicationSettings.DetectionOptimize.ToString());
-			rf24Settings.AddBoolean("invertIQ", this.applicationSettings.InvertIQ);
-			rf24Settings.AddString("detectionThreshold", this.applicationSettings.DetectionThreshold.ToString());
-			rf24Settings.AddUInt8("SyncWord", this.applicationSettings.SyncWord);
+			loRaSettings.AddString("detectionOptimize", this.applicationSettings.DetectionOptimize.ToString());
+			loRaSettings.AddBoolean("invertIQ", this.applicationSettings.InvertIQ);
+			loRaSettings.AddString("detectionThreshold", this.applicationSettings.DetectionThreshold.ToString());
+			loRaSettings.AddUInt8("SyncWord", this.applicationSettings.SyncWord);
 
-			this.loggingChannel.LogEvent("nRF24L01 configuration", rf24Settings, LoggingLevel.Information);
+			this.loggingChannel.LogEvent("LoRa configuration", loRaSettings, LoggingLevel.Information);
 
 			this.deferral = taskInstance.GetDeferral();
 		}
