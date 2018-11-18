@@ -6,9 +6,9 @@ using System.Runtime.InteropServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("AdaFruitIO.Swagger")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyDescription("nSwag generated client for AdaFruit.IO")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
+[assembly: AssemblyCompany("devMobile Software AdaFruit.IO client")]
 [assembly: AssemblyProduct("AdaFruitIO.Swagger")]
 [assembly: AssemblyCopyright("Copyright ©  2018")]
 [assembly: AssemblyTrademark("")]
