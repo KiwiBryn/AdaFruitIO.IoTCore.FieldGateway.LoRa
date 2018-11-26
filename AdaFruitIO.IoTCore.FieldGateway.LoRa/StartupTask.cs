@@ -24,13 +24,17 @@ namespace devMobile.AdaFruitIO.IoTCore.FieldGateway.LoRa
 	using System.IO;
 	using System.Text;
 	using System.Threading.Tasks;
-	using AdaFruit.IO;
-	using Newtonsoft.Json;
-	using Newtonsoft.Json.Converters;
+
+	using Windows.ApplicationModel;
 	using Windows.ApplicationModel.Background;
 	using Windows.Foundation.Diagnostics;
 	using Windows.Storage;
+	using Windows.System;
+
+	using AdaFruit.IO;
 	using devMobile.IoT.Rfm9x;
+	using Newtonsoft.Json;
+	using Newtonsoft.Json.Converters;
 
 	public sealed class StartupTask : IBackgroundTask
 	{
@@ -67,11 +71,11 @@ namespace devMobile.AdaFruitIO.IoTCore.FieldGateway.LoRa
 		private const byte InterruptLine = 16;
 		private Rfm9XDevice rfm9XDevice = new Rfm9XDevice(ChipSelectPin.CS1, InterruptLine);
 #endif
-#if UPUTRONICS_RPIPLUS_CS0 // 915MHz
+#if UPUTRONICS_RPIPLUS_CS0
 		private const byte InterruptLine = 25;
 		private Rfm9XDevice rfm9XDevice = new Rfm9XDevice(ChipSelectPin.CS0, InterruptLine);
 #endif
-#if UPUTRONICS_RPIPLUS_CS1 // 433MHz
+#if UPUTRONICS_RPIPLUS_CS1
 		private const byte InterruptLine = 16;
 		private Rfm9XDevice rfm9XDevice = new Rfm9XDevice(ChipSelectPin.CS1, InterruptLine);
 #endif
@@ -92,6 +96,44 @@ namespace devMobile.AdaFruitIO.IoTCore.FieldGateway.LoRa
 			{
 				return;
 			}
+
+			// Log the Application build, shield information etc.
+			LoggingFields appllicationBuildInformation = new LoggingFields();
+#if DRAGINO
+			appllicationBuildInformation.AddString("Shield", "DraginoLoRaGPSHat");
+#endif
+#if ELECROW
+			appllicationBuildInformation.AddString("Shield", "ElecrowRFM95IoTBoard");
+#endif
+#if M2M
+			appllicationBuildInformation.AddString("Shield", "M2M1ChannelLoRaWanGatewayShield");
+#endif
+#if ELECTRONIC_TRICKS
+			appllicationBuildInformation.AddString("Shield", "ElectronicTricksLoRaLoRaWANShield");
+#endif
+#if UPUTRONICS_RPIZERO_CS0
+			appllicationBuildInformation.AddString("Shield", "UputronicsPiZeroLoRaExpansionBoardCS0");
+#endif
+#if UPUTRONICS_RPIZERO_CS1
+			appllicationBuildInformation.AddString("Shield", "UputronicsPiZeroLoRaExpansionBoardCS1");
+#endif
+#if UPUTRONICS_RPIPLUS_CS0
+			appllicationBuildInformation.AddString("Shield", "UputronicsPiPlusLoRaExpansionBoardCS0");
+#endif
+#if UPUTRONICS_RPIPLUS_CS1
+			appllicationBuildInformation.AddString("Shield", "UputronicsPiPlusLoRaExpansionBoardCS1");
+#endif
+			appllicationBuildInformation.AddString("Timezone", TimeZoneSettings.CurrentTimeZoneDisplayName);
+			appllicationBuildInformation.AddString("OSVersion", Environment.OSVersion.VersionString);
+			appllicationBuildInformation.AddString("MachineName", Environment.MachineName);
+
+			// This is from the application manifest 
+			Package package = Package.Current;
+			PackageId packageId = package.Id;
+			PackageVersion version = packageId.Version;
+
+			appllicationBuildInformation.AddString("ApplicationVersion", string.Format($"{version.Major}.{version.Minor}.{version.Build}.{version.Revision}"));
+			this.loggingChannel.LogEvent("Application starting", appllicationBuildInformation, LoggingLevel.Information);
 
 			// Configure the AdaFruit API client
 			LoggingFields adaFruitIOSettings = new LoggingFields();
