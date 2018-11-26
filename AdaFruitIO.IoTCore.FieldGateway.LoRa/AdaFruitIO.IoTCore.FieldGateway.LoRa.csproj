@@ -31,7 +31,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|ARM'">
     <DebugSymbols>true</DebugSymbols>
     <OutputPath>bin\ARM\Debug\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;NETFX_CORE;WINDOWS_UWP;CODE_ANALYSIS,UPUTRONICS_RPIPLUS_CS0,ADDRESSED_MESSAGES_PAYLOAD</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;NETFX_CORE;WINDOWS_UWP;CODE_ANALYSIS,UPUTRONICS_RPIZERO_CS1,ADDRESSED_MESSAGES_PAYLOAD</DefineConstants>
     <NoWarn>;2008</NoWarn>
     <DebugType>full</DebugType>
     <PlatformTarget>ARM</PlatformTarget>
@@ -109,6 +109,14 @@
       <SubType>Designer</SubType>
     </AppxManifest>
     <None Include="AdaFruitIO.IoTCore.FieldGateway.LoRa_TemporaryKey.pfx" />
+    <None Include="Installers\DraginoLoRaGPSHat\AdaFruitIO.IoTCore.FieldGateway.LoRa_1.0.4.0_arm_Debug.appxbundle" />
+    <None Include="Installers\ElecrowRFM95IoTBoard\AdaFruitIO.IoTCore.FieldGateway.LoRa_1.0.4.0_arm_Debug.appxbundle" />
+    <None Include="Installers\ElectronicTricksLoRaLoRaWANShield\AdaFruitIO.IoTCore.FieldGateway.LoRa_1.0.4.0_arm_Debug.appxbundle" />
+    <None Include="Installers\M2M1ChannelLoRaWANGatewayShield\AdaFruitIO.IoTCore.FieldGateway.LoRa_1.0.4.0_arm_Debug.appxbundle" />
+    <None Include="Installers\UputronicsPiPlusLoRaExpansionBoardCS0\AdaFruitIO.IoTCore.FieldGateway.LoRa_1.0.4.0_arm_Debug.appxbundle" />
+    <None Include="Installers\UputronicsPiPlusLoRaExpansionBoardCS1\AdaFruitIO.IoTCore.FieldGateway.LoRa_1.0.4.0_arm_Debug.appxbundle" />
+    <None Include="Installers\UputronicsPiZeroLoRaExpansionBoardCS0\AdaFruitIO.IoTCore.FieldGateway.LoRa_1.0.4.0_arm_Debug.appxbundle" />
+    <None Include="Installers\UputronicsPiZeroLoRaExpansionBoardCS1\AdaFruitIO.IoTCore.FieldGateway.LoRa_1.0.4.0_arm_Debug.appxbundle" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Properties\Default.rd.xml" />
@@ -157,6 +165,7 @@
       <Name>Windows IoT Extensions for the UWP</Name>
     </SDKReference>
   </ItemGroup>
+  <ItemGroup />
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '15.0' ">
     <VisualStudioVersion>15.0</VisualStudioVersion>
   </PropertyGroup>
