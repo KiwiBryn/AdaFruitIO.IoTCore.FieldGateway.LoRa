@@ -280,21 +280,31 @@ namespace devMobile.AdaFruitIO.IoTCore.FieldGateway.LoRa
 
 		private async void Rfm9XDevice_OnReceive(object sender, Rfm9XDevice.OnDataReceivedEventArgs e)
 		{
+			string addressBcdText;
+			string messageBcdText;
+			string messageText = "";
 			char[] sensorReadingSeparator = new char[] { ',' };
 			char[] sensorIdAndValueSeparator = new char[] { ' ' };
 
-			string addressText = UTF8Encoding.UTF8.GetString(e.Address);
-			string addressBcdText = BitConverter.ToString(e.Address);
-			string messageText = UTF8Encoding.UTF8.GetString(e.Data);
-			string messageBcdText = BitConverter.ToString(e.Data);
+			addressBcdText = BitConverter.ToString(e.Address);
+
+			messageBcdText = BitConverter.ToString(e.Data);
+			try
+			{
+				messageText = UTF8Encoding.UTF8.GetString(e.Data);
+			}
+			catch (Exception)
+			{
+				this.loggingChannel.LogMessage("Failure converting payload to text", LoggingLevel.Error);
+				return;
+			}
 
 #if DEBUG
-			Debug.WriteLine(@"{0:HH:mm:ss}-RX From {1} PacketSnr {2:0.0} Packet RSSI {3}dBm RSSI {4}dBm = {5} byte message ""{6}""", DateTime.Now, addressText, e.PacketSnr, e.PacketRssi, e.Rssi, e.Data.Length, messageText);
+			Debug.WriteLine(@"{0:HH:mm:ss}-RX From {1} PacketSnr {2:0.0} Packet RSSI {3}dBm RSSI {4}dBm = {5} byte message ""{6}""", DateTime.Now, addressBcdText, e.PacketSnr, e.PacketRssi, e.Rssi, e.Data.Length, messageText);
 #endif
 			LoggingFields messagePayload = new LoggingFields();
 			messagePayload.AddInt32("AddressLength", e.Address.Length);
 			messagePayload.AddString("Address-BCD", addressBcdText);
-			messagePayload.AddString("Address-Unicode", addressText);
 			messagePayload.AddInt32("Message-Length", e.Data.Length);
 			messagePayload.AddString("Message-BCD", messageBcdText);
 			messagePayload.AddString("Nessage-Unicode", messageText);
@@ -331,7 +341,7 @@ namespace devMobile.AdaFruitIO.IoTCore.FieldGateway.LoRa
 			}
 
 			// Adafruit IO is case sensitive & onlye does lower case ?
-			string deviceId = addressText.ToLower();
+			string deviceId = addressBcdText.ToLower();
 
 			// Chop up the CSV text payload
 			string[] sensorReadings = messageText.Split(sensorReadingSeparator, StringSplitOptions.RemoveEmptyEntries);
