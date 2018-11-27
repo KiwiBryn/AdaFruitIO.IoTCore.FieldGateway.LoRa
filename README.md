@@ -3,7 +3,7 @@ AdaFruit.IO Windows 10 IotCore Field Gateway for LoRa capable devices
 
 A Windows 10 IoT Core application based on my [@RFM9X Library](https://github.com/KiwiBryn/RFM9XLoRa-NetMF) for uploading telemetry data from RFM9X/SX127X equipped devices to an [@AdaFruit.IO](https://io.adafruit.com/)
 
-[AdaFruit.IO](AdaFruit.IO.LoRaScreenShot.png)
+![AdaFruit.IO](AdaFruit.IO.LoRaScreenShot.png)
 
 The field gateway currently supports these shields
 
