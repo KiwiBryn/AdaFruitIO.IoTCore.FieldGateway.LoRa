@@ -79,6 +79,11 @@ namespace devMobile.AdaFruitIO.IoTCore.FieldGateway.LoRa
 		private const byte InterruptLine = 16;
 		private Rfm9XDevice rfm9XDevice = new Rfm9XDevice(ChipSelectPin.CS1, InterruptLine);
 #endif
+#if ADAFRUIT_RADIO_BONNET
+		private const byte ResetLine = 25;
+		private const byte InterruptLine = 22;
+		private Rfm9XDevice rfm9XDevice = new Rfm9XDevice(ChipSelectPin.CS1, ResetLine, InterruptLine);
+#endif
 		private const byte AddressLengthMinimum = 1;
 		private const byte AddressLengthMaximum = 15;
 
@@ -122,6 +127,9 @@ namespace devMobile.AdaFruitIO.IoTCore.FieldGateway.LoRa
 #endif
 #if UPUTRONICS_RPIPLUS_CS1
 			appllicationBuildInformation.AddString("Shield", "UputronicsPiPlusLoRaExpansionBoardCS1");
+#endif
+#if ADAFRUIT_RADIO_BONNET
+			appllicationBuildInformation.AddString("Shield", "AdafruitRadioBonnet");
 #endif
 			appllicationBuildInformation.AddString("Timezone", TimeZoneSettings.CurrentTimeZoneDisplayName);
 			appllicationBuildInformation.AddString("OSVersion", Environment.OSVersion.VersionString);
