@@ -6,10 +6,10 @@ using System.Runtime.InteropServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("AdaFruitIO.IoTCore.FieldGateway.LoRa")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyDescription("AdaFruitIO Field gateway for LoRa equipped devices")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("devMobile Software")]
-[assembly: AssemblyProduct("devMobile Software AdaFruit.Io LoRa FieldGateway")]
+[assembly: AssemblyProduct("devMobile Software AdaFruitIO LoRa Field Gateway")]
 [assembly: AssemblyCopyright("Copyright ©  2018")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
@@ -25,5 +25,5 @@ using System.Runtime.InteropServices;
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
 [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyFileVersion("1.0.1.0")]
+[assembly: AssemblyFileVersion("1.0.6.0")]
 [assembly: ComVisible(false)]

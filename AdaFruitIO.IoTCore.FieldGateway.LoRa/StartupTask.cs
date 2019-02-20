@@ -90,15 +90,32 @@ namespace devMobile.AdaFruitIO.IoTCore.FieldGateway.LoRa
 		private const byte MessageLengthMinimum = 3;
 		private const byte MessageLengthMaximum = 128;
 
-		private readonly LoggingChannel loggingChannel = new LoggingChannel("devMobile AdaFruit.IO LoRa Field Gateway", null, new Guid("4bd2826e-54a1-4ba9-bf63-92b73ea1ac4a"));
+		private readonly LoggingChannel logging = new LoggingChannel("devMobile AdaFruit.IO LoRa Field Gateway", null, new Guid("4bd2826e-54a1-4ba9-bf63-92b73ea1ac4a"));
 		private readonly AdaFruit.IO.Client adaFruitIOClient = new AdaFruit.IO.Client();
 		private ApplicationSettings applicationSettings = null;
 		private BackgroundTaskDeferral deferral;
 
 		public void Run(IBackgroundTaskInstance taskInstance)
 		{
-			if (!this.ConfigurationFileLoad().Result)
+			StorageFolder localFolder = ApplicationData.Current.LocalFolder;
+
+			try
 			{
+				// see if the configuration file is present if not copy minimal sample one from application directory
+				if (localFolder.TryGetItemAsync(ConfigurationFilename).AsTask().Result == null)
+				{
+					StorageFile templateConfigurationfile = Package.Current.InstalledLocation.GetFileAsync(ConfigurationFilename).AsTask().Result;
+					templateConfigurationfile.CopyAsync(localFolder, ConfigurationFilename).AsTask();
+				}
+
+				// Load the settings from configuration file exit application if missing or invalid
+				StorageFile file = localFolder.GetFileAsync(ConfigurationFilename).AsTask().Result;
+
+				applicationSettings = (JsonConvert.DeserializeObject<ApplicationSettings>(FileIO.ReadTextAsync(file).AsTask().Result));
+			}
+			catch (Exception ex)
+			{
+				this.logging.LogMessage("JSON configuration file load failed " + ex.Message, LoggingLevel.Error);
 				return;
 			}
 
@@ -141,7 +158,7 @@ namespace devMobile.AdaFruitIO.IoTCore.FieldGateway.LoRa
 			PackageVersion version = packageId.Version;
 
 			appllicationBuildInformation.AddString("ApplicationVersion", string.Format($"{version.Major}.{version.Minor}.{version.Build}.{version.Revision}"));
-			this.loggingChannel.LogEvent("Application starting", appllicationBuildInformation, LoggingLevel.Information);
+			this.logging.LogEvent("Application starting", appllicationBuildInformation, LoggingLevel.Information);
 
 			// Configure the AdaFruit API client
 			LoggingFields adaFruitIOSettings = new LoggingFields();
@@ -156,7 +173,7 @@ namespace devMobile.AdaFruitIO.IoTCore.FieldGateway.LoRa
 			adaFruitIOSettings.AddString("APIKey", this.applicationSettings.AdaFruitIOApiKey);
 			adaFruitIOSettings.AddString("UserName", this.applicationSettings.AdaFruitIOUserName);
 			adaFruitIOSettings.AddString("GroupName", this.applicationSettings.AdaFruitIOGroupName);
-			this.loggingChannel.LogEvent("AdaFruit.IO configuration", adaFruitIOSettings, LoggingLevel.Information);
+			this.logging.LogEvent("AdaFruit.IO configuration", adaFruitIOSettings, LoggingLevel.Information);
 
 			rfm9XDevice.OnReceive += Rfm9XDevice_OnReceive;
 			rfm9XDevice.OnTransmit += Rfm9XDevice_OnTransmit;
@@ -222,7 +239,7 @@ namespace devMobile.AdaFruitIO.IoTCore.FieldGateway.LoRa
 			loRaSettings.AddString("detectionThreshold", this.applicationSettings.DetectionThreshold.ToString());
 			loRaSettings.AddUInt8("SyncWord", this.applicationSettings.SyncWord);
 
-			this.loggingChannel.LogEvent("LoRa configuration", loRaSettings, LoggingLevel.Information);
+			this.logging.LogEvent("LoRa configuration", loRaSettings, LoggingLevel.Information);
 
 			this.deferral = taskInstance.GetDeferral();
 		}
@@ -230,60 +247,6 @@ namespace devMobile.AdaFruitIO.IoTCore.FieldGateway.LoRa
 		private void Rfm9XDevice_OnTransmit(object sender, Rfm9XDevice.OnDataTransmitedEventArgs e)
 		{
 			throw new NotImplementedException();
-		}
-
-		private async Task<bool> ConfigurationFileLoad()
-		{
-			StorageFolder localFolder = ApplicationData.Current.LocalFolder;
-
-			// Check to see if file exists
-			if (localFolder.TryGetItemAsync(ConfigurationFilename).GetAwaiter().GetResult() == null)
-			{
-				this.loggingChannel.LogMessage("Configuration file " + ConfigurationFilename + " not found", LoggingLevel.Error);
-
-				this.applicationSettings = new ApplicationSettings()
-				{
-					AdaFruitIOBaseUrl = "AdaFruit Base URL can go here",
-					AdaFruitIOUserName = "AdaFruit User name goes here",
-					AdaFruitIOApiKey = "AdaFruitIO API Key goes here",
-					AdaFruitIOGroupName = "AdaFruit Group name goes here",
-					Address = "Address here",
-					Frequency = 915000000,
-				};
-
-				// Create empty configuration file
-				StorageFile configurationFile = await localFolder.CreateFileAsync(ConfigurationFilename, CreationCollisionOption.OpenIfExists);
-				using (Stream stream = await configurationFile.OpenStreamForWriteAsync())
-				{
-					using (TextWriter streamWriter = new StreamWriter(stream))
-					{
-						streamWriter.Write(JsonConvert.SerializeObject(this.applicationSettings, Formatting.Indented));
-					}
-				}
-
-				return false;
-			}
-
-			try
-			{
-				// Load the configuration settings
-				StorageFile configurationFile = (StorageFile)await localFolder.TryGetItemAsync(ConfigurationFilename);
-
-				using (Stream stream = await configurationFile.OpenStreamForReadAsync())
-				{
-					using (StreamReader streamReader = new StreamReader(stream))
-					{
-						this.applicationSettings = JsonConvert.DeserializeObject<ApplicationSettings>(streamReader.ReadToEnd());
-					}
-				}
-
-				return true;
-			}
-			catch (Exception ex)
-			{
-				this.loggingChannel.LogMessage("Configuration file " + ConfigurationFilename + " load failed " + ex.Message, LoggingLevel.Error);
-				return false;
-			}
 		}
 
 		private async void Rfm9XDevice_OnReceive(object sender, Rfm9XDevice.OnDataReceivedEventArgs e)
@@ -303,7 +266,7 @@ namespace devMobile.AdaFruitIO.IoTCore.FieldGateway.LoRa
 			}
 			catch (Exception)
 			{
-				this.loggingChannel.LogMessage("Failure converting payload to text", LoggingLevel.Error);
+				this.logging.LogMessage("Failure converting payload to text", LoggingLevel.Error);
 				return;
 			}
 
@@ -319,32 +282,32 @@ namespace devMobile.AdaFruitIO.IoTCore.FieldGateway.LoRa
 			messagePayload.AddDouble("Packet SNR", e.PacketSnr);
 			messagePayload.AddInt32("Packet RSSI", e.PacketRssi);
 			messagePayload.AddInt32("RSSI", e.Rssi);
-			this.loggingChannel.LogEvent("Message Data", messagePayload, LoggingLevel.Verbose);
+			this.logging.LogEvent("Message Data", messagePayload, LoggingLevel.Verbose);
 
 			
 			// Check the address is not to short/long 
 			if (e.Address.Length < AddressLengthMinimum)
 			{
-				this.loggingChannel.LogMessage("From address too short", LoggingLevel.Warning);
+				this.logging.LogMessage("From address too short", LoggingLevel.Warning);
 				return;
 			}
 
 			if (e.Address.Length > MessageLengthMaximum)
 			{
-				this.loggingChannel.LogMessage("From address too long", LoggingLevel.Warning);
+				this.logging.LogMessage("From address too long", LoggingLevel.Warning);
 				return;
 			}
 
 			// Check the payload is not too short/long 
 			if (e.Data.Length < MessageLengthMinimum)
 			{
-				this.loggingChannel.LogMessage("Message too short to contain any data", LoggingLevel.Warning);
+				this.logging.LogMessage("Message too short to contain any data", LoggingLevel.Warning);
 				return;
 			}
 
 			if (e.Data.Length > MessageLengthMaximum)
 			{
-				this.loggingChannel.LogMessage("Message too long to contain valid data", LoggingLevel.Warning);
+				this.logging.LogMessage("Message too long to contain valid data", LoggingLevel.Warning);
 				return;
 			}
 
@@ -355,7 +318,7 @@ namespace devMobile.AdaFruitIO.IoTCore.FieldGateway.LoRa
 			string[] sensorReadings = messageText.Split(sensorReadingSeparator, StringSplitOptions.RemoveEmptyEntries);
 			if (sensorReadings.Length == 0)
 			{
-				this.loggingChannel.LogMessage("Payload contains no sensor readings", LoggingLevel.Warning);
+				this.logging.LogMessage("Payload contains no sensor readings", LoggingLevel.Warning);
 				return;
 			}
 
@@ -372,7 +335,7 @@ namespace devMobile.AdaFruitIO.IoTCore.FieldGateway.LoRa
 				// Check that there is an id & value
 				if (sensorIdAndValue.Length != 2)
 				{
-					this.loggingChannel.LogMessage("Sensor reading invalid format", LoggingLevel.Warning);
+					this.logging.LogMessage("Sensor reading invalid format", LoggingLevel.Warning);
 					return;
 				}
 
@@ -387,7 +350,7 @@ namespace devMobile.AdaFruitIO.IoTCore.FieldGateway.LoRa
 				Debug.WriteLine(" Sensor {0}{1} Value {2}", deviceId, sensorId, value);
 			}
 
-			this.loggingChannel.LogEvent("Sensor readings", sensorData, LoggingLevel.Verbose);
+			this.logging.LogEvent("Sensor readings", sensorData, LoggingLevel.Verbose);
 
 			try
 			{
@@ -398,7 +361,7 @@ namespace devMobile.AdaFruitIO.IoTCore.FieldGateway.LoRa
 			catch (Exception ex)
 			{
 				Debug.WriteLine(" CreateGroupDataAsync failed {0}", ex.Message);
-				this.loggingChannel.LogMessage("CreateGroupDataAsync failed " + ex.Message, LoggingLevel.Error);
+				this.logging.LogMessage("CreateGroupDataAsync failed " + ex.Message, LoggingLevel.Error);
 			}
 		}
 

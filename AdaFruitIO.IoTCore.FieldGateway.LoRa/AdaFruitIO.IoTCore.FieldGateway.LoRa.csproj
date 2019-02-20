@@ -109,6 +109,9 @@
       <SubType>Designer</SubType>
     </AppxManifest>
     <None Include="AdaFruitIO.IoTCore.FieldGateway.LoRa_TemporaryKey.pfx" />
+    <Content Include="config.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <None Include="Installers\DraginoLoRaGPSHat\AdaFruitIO.IoTCore.FieldGateway.LoRa_1.0.4.0_arm_Debug.appxbundle" />
     <None Include="Installers\ElecrowRFM95IoTBoard\AdaFruitIO.IoTCore.FieldGateway.LoRa_1.0.4.0_arm_Debug.appxbundle" />
     <None Include="Installers\ElectronicTricksLoRaLoRaWANShield\AdaFruitIO.IoTCore.FieldGateway.LoRa_1.0.4.0_arm_Debug.appxbundle" />
