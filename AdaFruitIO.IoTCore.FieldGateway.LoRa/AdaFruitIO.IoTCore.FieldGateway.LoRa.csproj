@@ -31,7 +31,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|ARM'">
     <DebugSymbols>true</DebugSymbols>
     <OutputPath>bin\ARM\Debug\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;NETFX_CORE;WINDOWS_UWP;ADAFRUIT_RADIO_BONNET;ADDRESSED_MESSAGES_PAYLOAD;CODE_ANALYSIS</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;NETFX_CORE;WINDOWS_UWP;M2M;ADDRESSED_MESSAGES_PAYLOAD;CODE_ANALYSIS</DefineConstants>
     <NoWarn>;2008</NoWarn>
     <DebugType>full</DebugType>
     <PlatformTarget>ARM</PlatformTarget>
@@ -117,9 +117,11 @@
     <None Include="Installers\Dependencies\Microsoft.NET.CoreRuntime.2.2.appx" />
     <None Include="Installers\Dependencies\Microsoft.VCLibs.ARM.Debug.14.00.appx" />
     <None Include="Installers\DraginoLoRaGPSHat\AdaFruitIO.IoTCore.FieldGateway.LoRa_1.0.4.0_arm_Debug.appxbundle" />
+    <None Include="Installers\DraginoLoRaGPSHat\AdaFruitIO.IoTCore.FieldGateway.LoRa_1.0.6.0_arm_Debug.appxbundle" />
     <None Include="Installers\ElecrowRFM95IoTBoard\AdaFruitIO.IoTCore.FieldGateway.LoRa_1.0.4.0_arm_Debug.appxbundle" />
     <None Include="Installers\ElectronicTricksLoRaLoRaWANShield\AdaFruitIO.IoTCore.FieldGateway.LoRa_1.0.4.0_arm_Debug.appxbundle" />
     <None Include="Installers\M2M1ChannelLoRaWANGatewayShield\AdaFruitIO.IoTCore.FieldGateway.LoRa_1.0.4.0_arm_Debug.appxbundle" />
+    <None Include="Installers\M2M1ChannelLoRaWANGatewayShield\AdaFruitIO.IoTCore.FieldGateway.LoRa_1.0.6.0_arm_Debug.appxbundle" />
     <None Include="Installers\UputronicsPiPlusLoRaExpansionBoardCS0\AdaFruitIO.IoTCore.FieldGateway.LoRa_1.0.4.0_arm_Debug.appxbundle" />
     <None Include="Installers\UputronicsPiPlusLoRaExpansionBoardCS1\AdaFruitIO.IoTCore.FieldGateway.LoRa_1.0.4.0_arm_Debug.appxbundle" />
     <None Include="Installers\UputronicsPiZeroLoRaExpansionBoardCS0\AdaFruitIO.IoTCore.FieldGateway.LoRa_1.0.4.0_arm_Debug.appxbundle" />
