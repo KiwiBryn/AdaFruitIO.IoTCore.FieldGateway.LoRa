@@ -67,14 +67,11 @@ The application has been tested with 433MHz and 915MHz devices and stress tested
 
 The "SensorIDIsDeviceIDSensorID" flag concatenates the deviceID and SensorID together so the device can work with Azure IoT Central.
 
-The packet format is detailed in these blog posts [@IoTCore](https://blog.devmobile.co.nz/2018/09/03/rfm9x-iotcore-payload-addressing/) and [@NetMF](https://blog.devmobile.co.nz/2018/09/04/rfm9x-netmf-payload-addressing/). It was intentionally kept simple to make it easier for students to user and debug.
+The packet format is detailed in these blog posts [@IoTCore](https://blog.devmobile.co.nz/2018/09/03/rfm9x-iotcore-payload-addressing/) and [@NetMF](https://blog.devmobile.co.nz/2018/09/04/rfm9x-netmf-payload-addressing/). It was intentionally kept simple to make it easier for students to use and debug.
 
 Future proposed enhancements include
-  * Device property support (Done Nov 2018)
-  * Azure Device provisioning support
-  * Cloud to device messaging
+  * Cloud to device messaging (MSMQ Field gateway)
   * OTA device provisioning
   * OTA Data encryption
-  * Remote settings configuration with Azure IoT Hub device twins
   * Support for other Windows 10 IoT Core devices e.g. Dragon Board 410C
   * Support for other SX127X/RFM9X shields/plates/mezzanine boards
