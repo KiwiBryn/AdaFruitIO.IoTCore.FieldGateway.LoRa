@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Package xmlns="http://schemas.microsoft.com/appx/manifest/foundation/windows10" xmlns:mp="http://schemas.microsoft.com/appx/2014/phone/manifest" xmlns:uap="http://schemas.microsoft.com/appx/manifest/uap/windows10" xmlns:iot="http://schemas.microsoft.com/appx/manifest/iot/windows10" IgnorableNamespaces="uap mp iot">
-  <Identity Name="AdaFruitIO.IoTCore.FieldGateway.LoRa" Publisher="CN=Bryn.Lewis" Version="1.0.8.0" />
+  <Identity Name="AdaFruitIO.IoTCore.FieldGateway.LoRa" Publisher="CN=BrynLewis" Version="1.0.8.0" />
   <mp:PhoneIdentity PhoneProductId="bc71c182-2c0e-4070-a51a-906513dd3d4b" PhonePublisherId="00000000-0000-0000-0000-000000000000" />
   <Properties>
     <DisplayName>devMobile Software AdaFruit.IO LoRa Field Gateway</DisplayName>
