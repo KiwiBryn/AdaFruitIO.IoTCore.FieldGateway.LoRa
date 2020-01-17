@@ -11,8 +11,8 @@
     <AssemblyName>AdaFruitIO.IoTCore.FieldGateway.LoRa</AssemblyName>
     <DefaultLanguage>en-US</DefaultLanguage>
     <TargetPlatformIdentifier>UAP</TargetPlatformIdentifier>
-    <TargetPlatformVersion>10.0.17134.0</TargetPlatformVersion>
-    <TargetPlatformMinVersion>10.0.17134.0</TargetPlatformMinVersion>
+    <TargetPlatformVersion>10.0.18362.0</TargetPlatformVersion>
+    <TargetPlatformMinVersion>10.0.17763.0</TargetPlatformMinVersion>
     <MinimumVisualStudioVersion>14</MinimumVisualStudioVersion>
     <EnableDotNetNativeCompatibleProfile>true</EnableDotNetNativeCompatibleProfile>
     <FileAlignment>512</FileAlignment>
@@ -32,7 +32,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|ARM'">
     <DebugSymbols>true</DebugSymbols>
     <OutputPath>bin\ARM\Debug\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;NETFX_CORE;WINDOWS_UWP;DRAGINO;ADDRESSED_MESSAGES_PAYLOAD;PAYLOAD_TEXT_COMA_SEPARATED_VALUES;CODE_ANALYSIS</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;NETFX_CORE;WINDOWS_UWP;M2M;ADDRESSED_MESSAGES_PAYLOAD;PAYLOAD_TEXT_COMA_SEPARATED_VALUES;CODE_ANALYSIS;</DefineConstants>
     <NoWarn>;2008</NoWarn>
     <DebugType>full</DebugType>
     <PlatformTarget>ARM</PlatformTarget>
@@ -157,7 +157,7 @@
       <Version>6.2.9</Version>
     </PackageReference>
     <PackageReference Include="Newtonsoft.Json">
-      <Version>12.0.2</Version>
+      <Version>12.0.3</Version>
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
@@ -169,11 +169,6 @@
       <Project>{7c875578-673e-4896-8b01-8cd9f6df0c7d}</Project>
       <Name>Rfm9XLoRaDevice</Name>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <SDKReference Include="WindowsIoT, Version=10.0.17134.0">
-      <Name>Windows IoT Extensions for the UWP</Name>
-    </SDKReference>
   </ItemGroup>
   <ItemGroup />
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '15.0' ">
