@@ -40,9 +40,17 @@ namespace devMobile.AdaFruitIO.IoTCore.FieldGateway.LoRa
 	{
 		private const string ConfigurationFilename = "config.json";
 
-		// LoRa Hardware interface configuration
+#if ARDUINO_LORA_DUPLEX_ADDRESSING
+      private const byte ArduinoLoRaDuplexHeaderLength = 4;
+      private const byte ArduinoLoRaDuplexPositionTo = 0;
+      private const byte ArduinoLoRaDuplexPositionFrom = 1;
+      private const byte ArduinoLoRaDuplexPositionMessageCount = 2;
+      private const byte ArduinoLoRaDuplexPositionPayloadLength = 3;
+#endif
+
+      // LoRa Hardware interface configuration
 #if DRAGINO
-		private const byte ChipSelectLine = 25;
+      private const byte ChipSelectLine = 25;
 		private const byte ResetLine = 17;
 		private const byte InterruptLine = 4;
 		private Rfm9XDevice rfm9XDevice = new Rfm9XDevice(ChipSelectPin.CS0, ChipSelectLine, ResetLine, InterruptLine);
@@ -203,13 +211,24 @@ namespace devMobile.AdaFruitIO.IoTCore.FieldGateway.LoRa
 
 			#if DEBUG
 				rfm9XDevice.RegisterDump();
-			#endif
+#endif
 
-			rfm9XDevice.Receive(Encoding.UTF8.GetBytes(this.applicationSettings.Address));
+#if ADDRESSED_MESSAGES_PAYLOAD
+         rfm9XDevice.Receive(Encoding.UTF8.GetBytes(this.applicationSettings.Address));
+#endif
+#if ARDUINO_LORA_DUPLEX_ADDRESSING
+         rfm9XDevice.Receive();
+#endif
 
-			LoggingFields loRaSettings = new LoggingFields();
-			loRaSettings.AddString("Address", this.applicationSettings.Address);
-			loRaSettings.AddDouble("Frequency", this.applicationSettings.Frequency);
+         LoggingFields loRaSettings = new LoggingFields();
+
+#if ADDRESSED_MESSAGES_PAYLOAD
+         loRaSettings.AddString("Address", this.applicationSettings.Address);
+#endif
+#if ARDUINO_LORA_DUPLEX_ADDRESSING
+         loRaSettings.AddString("Address", Convert.ToString(this.applicationSettings.Address, 16));
+#endif
+         loRaSettings.AddDouble("Frequency", this.applicationSettings.Frequency);
 			loRaSettings.AddBoolean("PABoost", this.applicationSettings.PABoost);
 
 			loRaSettings.AddUInt8("MaxPower", this.applicationSettings.MaxPower);
@@ -249,7 +268,8 @@ namespace devMobile.AdaFruitIO.IoTCore.FieldGateway.LoRa
 			throw new NotImplementedException();
 		}
 
-		private async void Rfm9XDevice_OnReceive(object sender, Rfm9XDevice.OnDataReceivedEventArgs e)
+#if ADDRESSED_MESSAGES_PAYLOAD
+      private async void Rfm9XDevice_OnReceive(object sender, Rfm9XDevice.OnDataReceivedEventArgs e)
 		{
 			string addressBcdText;
 			string messageBcdText;
@@ -364,8 +384,121 @@ namespace devMobile.AdaFruitIO.IoTCore.FieldGateway.LoRa
 				this.logging.LogMessage("CreateGroupDataAsync failed " + ex.Message, LoggingLevel.Error);
 			}
 		}
+#endif
 
-		private class ApplicationSettings
+#if ARDUINO_LORA_DUPLEX_ADDRESSING
+      private async void Rfm9XDevice_OnReceive(object sender, Rfm9XDevice.OnDataReceivedEventArgs e)
+		{
+		   string messageText = "";
+			char[] sensorReadingSeparator = new char[] { ',' };
+			char[] sensorIdAndValueSeparator = new char[] { ' ' };
+
+			if (( e.Data.Length < ArduinoLoRaDuplexHeaderLength) || (e.Data[ArduinoLoRaDuplexPositionTo] != applicationSettings.Address))
+         {
+            this.logging.LogMessage($"Message not for this device {e.Data[ArduinoLoRaDuplexPositionTo]:0X}0X", LoggingLevel.Information);
+            return;
+         }
+
+         int addressFrom = e.Data[ArduinoLoRaDuplexPositionFrom];
+         int payloadLength = e.Data[ArduinoLoRaDuplexPositionPayloadLength];
+
+         if ((ArduinoLoRaDuplexHeaderLength + payloadLength) != e.Data.Length)
+         {
+            this.logging.LogMessage($"Device {e.Data[ArduinoLoRaDuplexPositionTo]:0X}0X payload invalid length", LoggingLevel.Information);
+            return;
+         }
+
+         try
+         {
+            messageText = UTF8Encoding.UTF8.GetString(e.Data, ArduinoLoRaDuplexHeaderLength, payloadLength);
+         }
+         catch (Exception)
+         {
+            this.logging.LogMessage("Failure converting payload to text", LoggingLevel.Error);
+            return;
+         }
+
+#if DEBUG
+			Debug.WriteLine(@"{0:HH:mm:ss}-RX From {1} PacketSnr {2:0.0} Packet RSSI {3}dBm RSSI {4}dBm = {5} byte message ""{6}""", DateTime.Now, addressFrom, e.PacketSnr, e.PacketRssi, e.Rssi, payloadLength, messageText);
+#endif
+			LoggingFields messagePayload = new LoggingFields();
+         messagePayload.AddString("Address", Convert.ToString(e.Data[1], 16));
+         messagePayload.AddInt32("Message-Length", e.Data[3]);
+			messagePayload.AddString("Message-BCD", messageText);
+         messagePayload.AddDouble("Packet SNR", e.PacketSnr);
+			messagePayload.AddInt32("Packet RSSI", e.PacketRssi);
+			messagePayload.AddInt32("RSSI", e.Rssi);
+			this.logging.LogEvent("Message Data", messagePayload, LoggingLevel.Verbose);
+
+			// Check the payload is not too short/long 
+			if (e.Data.Length < MessageLengthMinimum)
+			{
+				this.logging.LogMessage("Message too short to contain any data", LoggingLevel.Warning);
+				return;
+			}
+
+			if (e.Data.Length > MessageLengthMaximum)
+			{
+				this.logging.LogMessage("Message too long to contain valid data", LoggingLevel.Warning);
+				return;
+			}
+
+			// Adafruit IO is case sensitive & only does lower case ?
+			string deviceId = Convert.ToString(e.Data[1], 16);
+
+			// Chop up the CSV text payload
+			string[] sensorReadings = messageText.Split(sensorReadingSeparator, StringSplitOptions.RemoveEmptyEntries);
+			if (sensorReadings.Length == 0)
+			{
+				this.logging.LogMessage("Payload contains no sensor readings", LoggingLevel.Warning);
+				return;
+			}
+
+			Group_feed_data groupFeedData = new Group_feed_data();
+
+			LoggingFields sensorData = new LoggingFields();
+			sensorData.AddString("DeviceID", deviceId);
+
+			// Chop up each sensor reading into an ID & value
+			foreach (string sensorReading in sensorReadings)
+			{
+				string[] sensorIdAndValue = sensorReading.Split(sensorIdAndValueSeparator, StringSplitOptions.RemoveEmptyEntries);
+
+				// Check that there is an id & value
+				if (sensorIdAndValue.Length != 2)
+				{
+					this.logging.LogMessage("Sensor reading invalid format", LoggingLevel.Warning);
+					return;
+				}
+
+				string sensorId = sensorIdAndValue[0].ToLower();
+				string value = sensorIdAndValue[1];
+
+				// Construct the sensor ID from SensordeviceID & Value ID
+				groupFeedData.Feeds.Add(new Anonymous2() { Key = string.Format("{0}-{1}", deviceId.ToLower(), sensorId.ToLower()), Value = value });
+
+				sensorData.AddString(sensorId, value);
+
+				Debug.WriteLine(" Sensor {0}{1} Value {2}", deviceId, sensorId, value);
+			}
+
+         this.logging.LogEvent("Sensor readings", sensorData, LoggingLevel.Verbose);
+
+         try
+         {
+				Debug.WriteLine(" CreateGroupDataAsync start");
+				await this.adaFruitIOClient.CreateGroupDataAsync(this.applicationSettings.AdaFruitIOUserName, this.applicationSettings.AdaFruitIOGroupName.ToLower(), groupFeedData);
+				Debug.WriteLine(" CreateGroupDataAsync finish");
+			}
+			catch (Exception ex)
+			{
+				Debug.WriteLine(" CreateGroupDataAsync failed {0}", ex.Message);
+				this.logging.LogMessage("CreateGroupDataAsync failed " + ex.Message, LoggingLevel.Error);
+			}
+		}
+#endif
+
+      private class ApplicationSettings
 		{
 			[JsonProperty("AdaFruitIOBaseUrl", Required = Required.DisallowNull)]
 			public string AdaFruitIOBaseUrl { get; set; }
@@ -380,11 +513,19 @@ namespace devMobile.AdaFruitIO.IoTCore.FieldGateway.LoRa
 			public string AdaFruitIOGroupName { get; set; }
 
 
+#if ADDRESSED_MESSAGES_PAYLOAD
 			// LoRa configuration parameters
 			[JsonProperty("Address", Required = Required.Always)]
 			public string Address { get; set; }
+#endif
 
-			[DefaultValue(Rfm9XDevice.FrequencyDefault)]
+#if ARDUINO_LORA_DUPLEX_ADDRESSING
+			// LoRa configuration parameters
+			[JsonProperty("Address", Required = Required.Always)]
+			public byte Address { get; set; }
+#endif
+
+         [DefaultValue(Rfm9XDevice.FrequencyDefault)]
 			[JsonProperty("Frequency", DefaultValueHandling = DefaultValueHandling.Populate)]
 			public double Frequency { get; set; }
 
